@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # Serviço MySQL
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: dKckRIC1kj
+      MYSQL_DATABASE: sql10749031
+      MYSQL_USER: sql10749031
+      MYSQL_PASSWORD: dKckRIC1kj
+    ports:
+      - "3307:3306"  # Expondo a porta MySQL
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - app-network
+
+  # Serviço Spring Boot
+  springboot-api:
+    build:
+      context: .
+      dockerfile: Dockerfile  # Nome do Dockerfile
+    container_name: springboot-api-container
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/estoque_db
+      SPRING_DATASOURCE_USERNAME: sql10749031
+      SPRING_DATASOURCE_PASSWORD: dKckRIC1kj
+      SPRING_DATASOURCE_DRIVER-CLASS-NAME: com.mysql.cj.jdbc.Driver
+    ports:
+      - "8080:8080"  # Expondo a porta da aplicação Spring Boot
+    depends_on:
+      - mysql
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql-data:

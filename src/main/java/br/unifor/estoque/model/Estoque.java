@@ -1,11 +1,10 @@
 package br.unifor.estoque.model;
 
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.List;
 
 @Component
 public class Estoque {
@@ -13,12 +12,33 @@ public class Estoque {
     @Autowired
     private LivroRepository livroRepository;
 
+    private final WebClient.Builder webClientBuilder;
+
+    @Autowired
+    public Estoque(WebClient.Builder webClientBuilder) {
+        this.webClientBuilder = webClientBuilder;
+    }
+
+    // Método que consome a API externa para buscar informações de um livro
+    public String consultarLivroNaApiExterna(String titulo) {
+        String url = "https://api.exemplo.com/livro?titulo=" + titulo;
+
+        return webClientBuilder.baseUrl(url)
+                .build()
+                .get()
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();  // Para bloquear e retornar a resposta de forma síncrona
+    }
+
     public List<Livro> buscarPorAutor(String autor) {
         return livroRepository.findByAutor(autor);
     }
+
     public List<Livro> buscarTodos() {
         return livroRepository.findAll();
     }
+
     public List<Livro> buscarPorTitulo(String titulo) {
         return livroRepository.findByTitulo(titulo);
     }
@@ -56,5 +76,4 @@ public class Estoque {
             throw new RuntimeException("Quantidade insuficiente para o livro " + livroEncontrado.getTitulo());
         }
     }
-
 }

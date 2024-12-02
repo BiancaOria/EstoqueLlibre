@@ -1,6 +1,5 @@
 package br.unifor.estoque.controller;
 
-
 import br.unifor.estoque.model.Estoque;
 import br.unifor.estoque.model.Livro;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +26,12 @@ public class EstoqueController {
 
     @GetMapping("/titulo/{titulo}")
     public List<Livro> buscarPorTitulo(@PathVariable String titulo) {
+        // Chama o método para consultar a API externa
+        String respostaApi = estoqueService.consultarLivroNaApiExterna(titulo);
+        System.out.println("Resposta da API Externa: " + respostaApi);
+
+        // Se necessário, use a resposta da API para retornar algo para o usuário
+        // Aqui estou apenas imprimindo no console a resposta da API externa
         return estoqueService.buscarPorTitulo(titulo);
     }
 
@@ -34,8 +39,9 @@ public class EstoqueController {
     public List<Livro> buscarPorAno(@PathVariable int ano) {
         return estoqueService.buscarPorAno(ano);
     }
+
     @GetMapping("/todos")
-    public List<Livro> buscarTodos(@PathVariable int ano) {
+    public List<Livro> buscarTodos() {
         return estoqueService.buscarTodos();
     }
 
@@ -43,11 +49,11 @@ public class EstoqueController {
     public List<Livro> buscarPorGenero(@PathVariable String genero) {
         return estoqueService.buscarPorGenero(genero);
     }
-    @PostMapping("/add")
-    public String addLivro(@RequestBody  Livro livro) {
-        estoqueService.addLivro(livro);
 
-        return "1";
+    @PostMapping("/add")
+    public String addLivro(@RequestBody Livro livro) {
+        estoqueService.addLivro(livro);
+        return "Livro adicionado ao estoque!";
     }
 
     @DeleteMapping("/remover/{id}")
@@ -59,6 +65,4 @@ public class EstoqueController {
     public void darBaixa(@PathVariable Long id) {
         estoqueService.darBaixa(id);
     }
-
 }
-
